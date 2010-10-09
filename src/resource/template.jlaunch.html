@@ -1,0 +1,52 @@
+<html>
+	<head>
+		<title>$title</title>
+		<script src="http://www.java.com/js/deployJava.js"></script>
+		<script type="text/javascript">
+			function launchApplet() {
+				if (deployJava.versionCheck('1.6')) {
+					var applet = document.createElement('applet');
+					applet.setAttribute('code', 'com.googlecode.jlaunch.JLaunch');
+					applet.setAttribute('archive', '$baseURLjlaunch.jar');
+					applet.setAttribute('codebase', '$baseURL');
+					applet.setAttribute('width', '$width');
+					applet.setAttribute('height', '$height');
+	
+					var p = document.createElement('param');
+					p.setAttribute('name', 'separate_jvm');
+					p.setAttribute('value', 'true');
+					applet.appendChild(p);
+	
+					p = document.createElement('param');
+					p.setAttribute('name', 'propertiesURL');
+					p.setAttribute('value', '$baseURLjlaunch.properties');
+					applet.appendChild(p);
+	
+					var image = document.getElementById('appletImage');
+					
+					var div = document.getElementById('appletDiv');
+					div.removeChild(image);
+					div.appendChild(applet);
+				} else {
+					var jres = deployJava.getJREs();
+					var s = ''
+					for (var i = 0; i < jres.length; i++) {
+						if (i > 0) {
+							s += ', ';
+						}
+						s += jres[i];
+					}
+					var response = confirm('Java 1.6 or greater is required to run this applet.\n\nYou currently have: ' + s + '\n\nWould you like to install the latest version of Java now?');
+					if (response == true) {
+						deployJava.installLatestJRE();
+					}
+				}
+			}
+		</script>
+	</head>
+	<body style="overflow: hidden; margin: 0px 0px 0px 0px;">
+		<div id="appletDiv">
+			<img id="appletImage" src="$baseURL$preview" onclick="launchApplet();"/>
+		</div>
+	</body>
+</html>

@@ -1,0 +1,13 @@
+
+syntax: regexp
+^build$
+syntax: regexp
+^sgine$
+syntax: regexp
+^\.settings$
+syntax: regexp
+^bin$
+syntax: regexp
+^\.classpath$
+syntax: regexp
+^\.project$

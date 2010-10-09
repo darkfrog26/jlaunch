@@ -1,0 +1,6 @@
+		<echo>Packing $jar</echo>
+		<exec executable="pack200">
+			<arg value="-E9"/>
+			<arg value="$packedjar"/>
+			<arg value="$jar"/>
+		</exec>

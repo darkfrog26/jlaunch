@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<project name="$title" basedir="." default="deploy">
+	<macrodef name="unsignjar">
+	    <attribute name="jar"/>
+	    <sequential>
+		<!-- Remove any existing signatures from a JAR file. -->
+		<tempfile prefix="usignjar-" destdir="${java.io.tmpdir}" property="temp.file"/>
+	        <echo message="Removing signatures from JAR: @{jar}"/>
+	        <mkdir dir="${temp.file}"/>
+		        
+	        <unjar src="@{jar}" dest="${temp.file}">
+	            <patternset>
+	                <include name="**"/>
+	                <exclude name="META-INF/*.SF"/>
+	                <exclude name="META-INF/*.DSA"/>
+	                <exclude name="META-INF/*.RSA"/>
+	            	<!-- May be a bad thing, but it's required! -->
+	            	<exclude name="META-INF/MANIFEST.MF"/>
+	            </patternset>
+	        </unjar>
+		        
+	        <delete file="@{jar}" failonerror="true"/>
+		        
+	        <!-- Touch it in case the file didn't have a manifest.
+	             Otherwise the JAR task below will fail if the manifest 
+		     file doesn't exist. -->
+	        <mkdir dir="${temp.file}/META-INF"/>
+	        <touch file="${temp.file}/META-INF/MANIFEST.MF"/>
+		        
+	        <jar destfile="@{jar}" 
+	            basedir="${temp.file}" 
+	            includes="**" 
+	            manifest="${temp.file}/META-INF/MANIFEST.MF"/>
+		        
+	        <delete dir="${temp.file}" failonerror="true"/>
+	    </sequential>
+	</macrodef>
+	
+	<target name="yguard">
+		<taskdef name="yguard" classname="com.yworks.yguard.YGuardTask"/>
+		<yguard>
+			<inoutpairs resources="copy">
+				<fileset dir=".">
+					<include name="*.jar"/>
+				</fileset>
+				<mapper type="glob" from="*.jar" to="obfuscated/*.jar"/>
+			</inoutpairs>
+			<shrink logfile="log.shrink.xml">
+				<keep>
+					$keepMainClass
+					<class name="org.lwjgl.opengl.WindowsDisplay" methods="private" fields="public"/>
+				</keep>
+			</shrink>
+		</yguard>
+	</target>
+	
+	<target name="generate-keystore">
+		<genkey keystore="$keystore" alias="$alias" keypass="$keypass" storepass="$storepass">
+			<dname>
+				<param name="CN" value="$cn"/>
+				<param name="OU" value="$ou"/>
+				<param name="O" value="$o"/>
+				<param name="C" value="$c"/>
+			</dname>
+		</genkey>
+	</target>
+	
+	<target name="repack">
+$repack
+	</target>
+	
+	<target name="sign-jars">
+$signjars
+	</target>
+	
+	<target name="pack200">
+$pack200
+	</target>
+	
+	<target name="deploy" depends="yguard, repack, sign-jars, pack200">
+		<!-- Provide non-packed jlaunch -->
+		<copy file="signed/jlaunch.jar" todir="dist"/>
+		<!-- Bring all packed jars over -->
+		<copy todir="dist">
+			<fileset dir="pack200">
+				<include name="*"/>
+			</fileset>
+		</copy>
+		<!-- Copy Properties file -->
+		<copy file="jlaunch.properties" todir="dist"/>
+		<!-- Copy HTML file -->
+		<copy file="jlaunch.html" todir="dist"/>
+		<!-- Copy Preview image over -->
+		<copy file="$preview" todir="dist"/>
+	</target>
+</project>

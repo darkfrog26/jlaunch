@@ -1,0 +1,7 @@
+		<echo>Repacking $jar</echo>
+		<copy file="$jar" tofile="$repackjar"/>
+		<unsignjar jar="$repackjar"/>
+		<exec executable="pack200">
+			<arg value="--repack"/>
+			<arg value="$repackjar"/>
+		</exec>

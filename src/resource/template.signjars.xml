@@ -1,0 +1,8 @@
+		<signjar
+			keystore="$keystore"
+			alias="$alias"
+			keypass="$keypass"
+			storepass="$storepass"
+			verbose="false"
+			jar="$jar"
+			signedjar="$signedjar"/>

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<project name="jlaunch" basedir="." default="jar">
+	<property environment="env" />
+
+	<property name="src" location="src" />
+	<property name="build" location="build" />
+	<property name="dist" location="dist" />
+	<property name="lib" location="lib" />
+	<property name="jar" value="${ant.project.name}.jar" />
+	<property name="jar.deploy" value="${ant.project.name}.deployer.jar" />
+	<property name="keystore" value="${user.home}/sgine.keystore" />
+
+	<target name="compile">
+		<delete dir="${build}" />
+		<mkdir dir="${build}" />
+		<mkdir dir="${dist}" />
+		<javac srcdir="${src}" destdir="${build}" source="1.5" target="1.5" debug="true">
+			<compilerarg value="-Xlint:unchecked"/>
+		</javac>
+	</target>
+
+	<target name="jar" depends="compile">
+		<jar destfile="${dist}/${jar}" index="true">
+			<manifest>
+				<attribute name="Built-By" value="Matthew D. Hicks"/>
+			</manifest>
+			<fileset dir="${build}" excludes="com/googlecode/jlaunch/deploy/**, resource/**"/>
+		</jar>
+		<jar destfile="${dist}/${jar.deploy}" index="true">
+			<manifest>
+				<attribute name="Built-By" value="Matthew D. Hicks"/>
+				<attribute name="Main-Class" value="com.googlecode.jlaunch.deploy.Deployer"/>
+			</manifest>
+			<fileset dir="${build}" includes="com/googlecode/jlaunch/deploy/**"/>
+			<fileset dir="${src}" includes="resource/**"/>
+		</jar>
+	</target>
+</project>
