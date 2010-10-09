@@ -6,14 +6,12 @@ import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FilePermission;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -91,8 +89,8 @@ public class Loader extends Thread {
 			
 			launch.setMessage("Initializing Application");
 			startApplication();
-		} catch(Exception exc) {
-			exc.printStackTrace();
+		} catch(Throwable t) {
+			JException.showException(launch, t);
 		}
 	}
 	
@@ -160,7 +158,11 @@ public class Loader extends Thread {
 					}
 					codebase += File.separator;
 				}
-				return System.getProperty("java.io.tmpdir") + codebase + title + File.separator + version + File.separator;
+				String tempDir = System.getProperty("java.io.tmpdir");
+				if ((!tempDir.endsWith("/")) && (!tempDir.endsWith("\\"))) {
+					tempDir += File.separator;
+				}
+				return tempDir + codebase + title + File.separator + version + File.separator;
 			}
 		});
 		
