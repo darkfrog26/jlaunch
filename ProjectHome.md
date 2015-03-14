@@ -1,0 +1,1 @@
+Java Launch Framework for launching Applets, WebStart, and Applications. The project's goal is to simplify deployment of Java applications in any form.
